@@ -17,9 +17,18 @@ export function OperatorDashboard() {
   return (
     <div className="min-h-screen bg-slate-100">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-4">
-          <h1 className="text-2xl font-bold text-slate-900">SRM Credit Engine</h1>
-          <p className="text-sm text-slate-600">Painel do Operador — Cessão de Crédito Multimoedas</p>
+        <div className="mx-auto flex max-w-7xl items-center gap-4 px-6 py-4">
+          <img
+            src="/srmLogo.png"
+            alt="SRM Credit Engine"
+            width={48}
+            height={48}
+            className="rounded-xl"
+          />
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">SRM Credit Engine</h1>
+            <p className="text-sm text-slate-600">Painel do Operador — Cessão de Crédito Multimoedas</p>
+          </div>
         </div>
       </header>
 

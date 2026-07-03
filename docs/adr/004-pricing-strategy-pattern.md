@@ -2,7 +2,7 @@
 
 **Status**: Accepted  
 **Date**: 2026-07-03  
-**Deciders**: Kaique Bernardo  
+**Deciders**: kahbernardo  
 **Tags**: #architecture #pricing #design-patterns
 
 ## Context

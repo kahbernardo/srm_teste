@@ -2,7 +2,7 @@
 
 **Status**: Accepted  
 **Date**: 2026-07-03  
-**Deciders**: Kaique Bernardo, Claude Sonnet 4.5  
+**Deciders**: kahbernardo, Claude Sonnet 4.5  
 **Tags**: #architecture #stack #database
 
 ## Context
@@ -147,6 +147,6 @@ Precisávamos decidir:
 
 ## Sign-off
 
-**Approved by**: Kaique Bernardo  
+**Approved by**: kahbernardo  
 **Date**: 2026-07-03  
 **Review Date**: 2026-10-03 (3 meses)

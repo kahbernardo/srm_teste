@@ -212,5 +212,6 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ---
 
-[Unreleased]: https://github.com/seu-usuario/srm-credit-engine/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/seu-usuario/srm-credit-engine/releases/tag/v0.1.0
+[Unreleased]: https://github.com/kahbernardo/srm_teste/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/kahbernardo/srm_teste/releases/tag/v1.0.0
+[0.1.0]: https://github.com/kahbernardo/srm_teste/releases/tag/v0.1.0

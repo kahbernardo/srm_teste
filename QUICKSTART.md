@@ -24,7 +24,7 @@ docker -v # deve retornar >= 24.0
 
 ```bash
 # Clone o repositório (se ainda não fez)
-git clone https://github.com/seu-usuario/srm-credit-engine.git
+git clone https://github.com/kahbernardo/srm_teste.git
 cd srm-credit-engine
 
 # Instale todas as dependências (monorepo)

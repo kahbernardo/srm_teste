@@ -4,6 +4,10 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'SRM Credit Engine',
   description: 'Plataforma de Cessão de Crédito Multimoedas',
+  icons: {
+    icon: '/srmLogo.png',
+    apple: '/srmLogo.png',
+  },
 };
 
 export default function RootLayout({

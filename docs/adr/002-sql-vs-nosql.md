@@ -2,7 +2,7 @@
 
 **Status**: Accepted  
 **Date**: 2026-07-03  
-**Deciders**: Kaique Bernardo  
+**Deciders**: kahbernardo  
 **Tags**: #architecture #database #persistence #acid
 
 **Relacionado**: [ADR-001: Stack Selection](./001-stack-selection.md)
@@ -124,6 +124,6 @@ return await this.db.$transaction(async (tx) => {
 
 ## Sign-off
 
-**Approved by**: Kaique Bernardo  
+**Approved by**: kahbernardo  
 **Date**: 2026-07-03  
 **Review Date**: 2026-10-03 (3 meses)

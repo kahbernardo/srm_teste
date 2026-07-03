@@ -2,7 +2,7 @@
 
 **Status**: Accepted  
 **Date**: 2026-07-03  
-**Deciders**: Kaique Bernardo  
+**Deciders**: kahbernardo  
 **Tags**: #architecture #deployment #monolith #mvp
 
 **Relacionado**: [ADR-001: Stack Selection](./001-stack-selection.md), [ADR-002: SQL vs NoSQL](./002-sql-vs-nosql.md)
@@ -127,6 +127,6 @@ Microserviços serão considerados **somente** quando gatilhos objetivos forem a
 
 ## Sign-off
 
-**Approved by**: Kaique Bernardo  
+**Approved by**: kahbernardo  
 **Date**: 2026-07-03  
 **Review Date**: 2026-10-03 (3 meses)

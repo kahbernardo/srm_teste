@@ -103,7 +103,7 @@ O caso da serialização Fastify (Issue #1 em KNOWN_ISSUES.md) é exemplo onde a
 - A IA pode sugerir marcar critérios de aceite como completos antes de rodar testes
 - Código financeiro (NUMERIC, transações ACID) exige testes de integração com banco real
 - Decisões de stack e arquitetura são humanas; ADRs registram o raciocínio
-- **Autor final:** Kaique Bernardo
+- **Autor final:** kahbernardo
 - **Co-autor IA:** Claude Sonnet 4.5 (documentado no README)
 
 ---

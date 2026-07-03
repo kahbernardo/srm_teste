@@ -1,6 +1,6 @@
 # SRM Credit Engine 💰
 
-[![CI](https://github.com/seu-usuario/srm-credit-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/seu-usuario/srm-credit-engine/actions/workflows/ci.yml)
+[![CI](https://github.com/kahbernardo/srm_teste/actions/workflows/ci.yml/badge.svg)](https://github.com/kahbernardo/srm_teste/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-%E2%89%A580%25-brightgreen)](./apps/backend)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.11.0-brightgreen)](https://nodejs.org)
@@ -51,7 +51,7 @@ A **SRM Asset** opera no mercado de FIDCs, adquirindo ativos financeiros (duplic
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/srm-credit-engine.git
+git clone https://github.com/kahbernardo/srm_teste.git
 cd srm-credit-engine
 
 # Instale dependências (workspaces Turborepo)
@@ -177,7 +177,7 @@ Fontes PlantUML e instruções de regeneração: [docs/diagrams/README.md](./doc
 
 ## 📊 Dashboard
 
-Preview do Operator Dashboard (M3 em andamento):
+Preview do Operator Dashboard:
 
 ![Dashboard Preview](./docs/screenshots/dashboard-preview.png)
 
@@ -343,7 +343,7 @@ Este projeto está sob a licença MIT. Ver arquivo [LICENSE](./LICENSE).
 
 ## 👥 Autores
 
-- **Kaique Bernardo** - *Desenvolvimento Inicial* - [@kaiquebernardo](https://github.com/kaiquebernardo)
+- **kahbernardo** - *Desenvolvimento Inicial* - [@kahbernardo](https://github.com/kahbernardo)
 
 **Co-Authored-By:** Claude Sonnet 4.5 <noreply@anthropic.com>
 
@@ -353,4 +353,3 @@ Este projeto está sob a licença MIT. Ver arquivo [LICENSE](./LICENSE).
 - [Linear Project](https://linear.app/dupappbr/project/srm-credit-engine-f7e7a0ea1750)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [Turborepo Docs](https://turbo.build/repo/docs)
-# srm_teste
