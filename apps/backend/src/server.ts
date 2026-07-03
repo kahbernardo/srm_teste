@@ -50,7 +50,13 @@ async function start() {
 
     // CORS configuration
     await server.register(cors, {
-      origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+      origin:
+        process.env.ALLOWED_ORIGINS?.split(',') || [
+          'http://localhost:3000',
+          'http://localhost:3001',
+          'http://localhost:3002',
+          'http://localhost:3003',
+        ],
       credentials: true,
     });
 
