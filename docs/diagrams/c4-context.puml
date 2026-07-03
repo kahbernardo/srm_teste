@@ -1,0 +1,19 @@
+@startuml c4-context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Diagrama de Contexto - SRM Credit Engine
+
+Person(operador, "Operador da Mesa", "Precifica e liquida ativos via dashboard")
+Person(admin, "Administrador", "Gerencia moedas, taxas e tipos de ativo")
+System_Ext(cedente, "Sistema Cedente", "ERP origem das duplicatas e recebiveis")
+System_Ext(cambio, "Fonte de Cambio", "BCB ou entrada manual de taxas")
+
+System(srm, "SRM Credit Engine", "Plataforma de cessao de credito multimoedas BRL/USD")
+
+Rel(operador, srm, "Opera", "HTTPS")
+Rel(admin, srm, "Configura", "REST/JSON")
+Rel(cedente, srm, "Envia referencias de ativos", "REST/JSON")
+Rel(srm, cambio, "Consulta taxas de cambio", "HTTPS")
+
+SHOW_LEGEND()
+@enduml

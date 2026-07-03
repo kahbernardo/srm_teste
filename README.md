@@ -100,6 +100,8 @@ srm-credit-engine/
 - [C4 - Container Diagram](./docs/diagrams/c4-container.png)
 - [Entity-Relationship Diagram](./docs/diagrams/er-diagram.png)
 
+Fontes PlantUML e instruções de regeneração: [docs/diagrams/README.md](./docs/diagrams/README.md)
+
 ## 🚀 Quick Start
 
 ### Pré-requisitos

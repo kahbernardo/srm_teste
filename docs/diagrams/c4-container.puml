@@ -1,0 +1,24 @@
+@startuml c4-container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Diagrama de Container - SRM Credit Engine
+
+Person(operador, "Operador da Mesa", "Mesa de operacao do FIDC")
+Person(admin, "Administrador", "Configura parametros do sistema")
+
+System_Boundary(srm, "SRM Credit Engine") {
+    Container(web, "Web App", "Next.js 14", "Dashboard operacional para mesa de operacao")
+    Container(api, "API Application", "Node.js / Fastify / TypeScript", "Monolito modular: presentation, business, persistence. Pricing, cambio e settlement")
+    ContainerDb(db, "Database", "PostgreSQL 16", "Transacoes ACID, taxas, ativos. Prisma ORM")
+}
+
+System_Ext(cedente, "Sistema Cedente", "ERP origem dos ativos")
+
+Rel(operador, web, "Usa", "HTTPS")
+Rel(admin, api, "Gerencia via API", "REST/JSON")
+Rel(web, api, "Chama", "REST/JSON")
+Rel(api, db, "Le/Escreve", "SQL via Prisma")
+Rel(cedente, api, "Envia referencias", "REST/JSON")
+
+SHOW_LEGEND()
+@enduml
