@@ -1,0 +1,126 @@
+// SQLite version for local development
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ========================================
+// CURRENCY ENGINE
+// ========================================
+
+model Currency {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  name      String
+  symbol    String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  exchangeRatesFrom ExchangeRate[] @relation("FromCurrency")
+  exchangeRatesTo   ExchangeRate[] @relation("ToCurrency")
+  transactions      Transaction[]
+
+  @@map("currencies")
+}
+
+model ExchangeRate {
+  id             String   @id @default(uuid())
+  fromCurrencyId String   @map("from_currency_id")
+  toCurrencyId   String   @map("to_currency_id")
+  rate           Float    // SQLite doesn't have DECIMAL, use Float
+  validFrom      DateTime @map("valid_from")
+  validUntil     DateTime? @map("valid_until")
+  source         String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  fromCurrency Currency @relation("FromCurrency", fields: [fromCurrencyId], references: [id])
+  toCurrency   Currency @relation("ToCurrency", fields: [toCurrencyId], references: [id])
+
+  @@unique([fromCurrencyId, toCurrencyId, validFrom])
+  @@map("exchange_rates")
+}
+
+model AssetType {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  pricingStrategies PricingStrategy[]
+  transactions      Transaction[]
+
+  @@map("asset_types")
+}
+
+model PricingStrategy {
+  id              String   @id @default(uuid())
+  assetTypeId     String   @map("asset_type_id")
+  strategyName    String   @map("strategy_name")
+  baseSpread      Float    @map("base_spread")
+  minSpread       Float    @map("min_spread")
+  maxSpread       Float    @map("max_spread")
+  riskMultiplier  Float    @map("risk_multiplier")
+  validFrom       DateTime @map("valid_from")
+  validUntil      DateTime? @map("valid_until")
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  assetType AssetType @relation(fields: [assetTypeId], references: [id])
+
+  @@unique([assetTypeId, validFrom])
+  @@map("pricing_strategies")
+}
+
+model Transaction {
+  id                   String   @id @default(uuid())
+  externalReference    String?  @map("external_reference")
+  assetTypeId          String   @map("asset_type_id")
+  currencyId           String   @map("currency_id")
+
+  faceValue            Float    @map("face_value")
+  daysToMaturity       Int      @map("days_to_maturity")
+
+  discountRate         Float    @map("discount_rate")
+  discountAmount       Float    @map("discount_amount")
+  netAmount            Float    @map("net_amount")
+
+  exchangeRateApplied  Float?   @map("exchange_rate_applied")
+  convertedAmount      Float?   @map("converted_amount")
+  targetCurrencyId     String?  @map("target_currency_id")
+
+  status               String   @default("PENDING")
+  settledAt            DateTime? @map("settled_at")
+
+  createdBy            String   @map("created_by")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+  version              Int      @default(1)
+
+  assetType AssetType @relation(fields: [assetTypeId], references: [id])
+  currency  Currency  @relation(fields: [currencyId], references: [id])
+
+  @@map("transactions")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  entityType  String   @map("entity_type")
+  entityId    String   @map("entity_id")
+  action      String
+  changes     String?  // JSON as string in SQLite
+  performedBy String   @map("performed_by")
+  performedAt DateTime @default(now()) @map("performed_at")
+  ipAddress   String?  @map("ip_address")
+
+  @@map("audit_logs")
+}

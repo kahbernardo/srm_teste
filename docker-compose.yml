@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: srm-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: srm_user
+      POSTGRES_PASSWORD: srm_password
+      POSTGRES_DB: srm_credit_engine
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U srm_user -d srm_credit_engine']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - srm-network
+
+  # Backend API
+  # Uncomment when Dockerfile is ready
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/backend/Dockerfile
+  #   container_name: srm-backend
+  #   restart: unless-stopped
+  #   environment:
+  #     NODE_ENV: development
+  #     PORT: 4000
+  #     DATABASE_URL: postgresql://srm_user:srm_password@postgres:5432/srm_credit_engine?schema=public
+  #     ALLOWED_ORIGINS: http://localhost:3000
+  #   ports:
+  #     - '4000:4000'
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ./apps/backend:/app
+  #     - /app/node_modules
+  #   networks:
+  #     - srm-network
+  #   command: npm run dev
+
+  # Frontend Web
+  # Uncomment when Dockerfile is ready
+  # web:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/web/Dockerfile
+  #   container_name: srm-web
+  #   restart: unless-stopped
+  #   environment:
+  #     NODE_ENV: development
+  #     NEXT_PUBLIC_API_URL: http://localhost:4000
+  #   ports:
+  #     - '3000:3000'
+  #   depends_on:
+  #     - backend
+  #   volumes:
+  #     - ./apps/web:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   networks:
+  #     - srm-network
+  #   command: npm run dev
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  srm-network:
+    driver: bridge
