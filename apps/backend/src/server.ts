@@ -114,6 +114,48 @@ async function start() {
       documentation: '/docs',
     }));
 
+    // Debug endpoint
+    server.get('/debug-json', async () => ({
+      success: true,
+      data: {
+        id: 'test-123',
+        value: 100.50,
+        name: 'Test',
+      },
+    }));
+
+    // Debug service call
+    server.get('/debug-service', async () => {
+      const { TransactionService } = await import('./business/services/transaction.service');
+      const service = new TransactionService();
+
+      const result = await service.createTransaction({
+        externalReference: 'DEBUG-SERVICE',
+        assetTypeId: '6f943a9f-8689-4b0a-9eb1-d8a021b1a8f3',
+        currencyId: '50fd2523-2dd8-459b-8328-aedfb568c70f',
+        faceValue: 10000,
+        daysToMaturity: 30,
+        createdBy: 'debug',
+      });
+
+      return {
+        success: true,
+        data: result,
+      };
+    });
+
+    // Debug get transaction
+    server.get('/debug-get/:id', async (request: any) => {
+      const { TransactionService } = await import('./business/services/transaction.service');
+      const service = new TransactionService();
+      const result = await service.getTransaction(request.params.id);
+
+      return {
+        success: true,
+        data: result,
+      };
+    });
+
     // Register API routes
     await server.register(transactionRoutes, { prefix: '/api/v1' });
     await server.register(currencyRoutes, { prefix: '/api/v1' });

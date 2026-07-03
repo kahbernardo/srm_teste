@@ -1,8 +1,24 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { TransactionService } from '../../business/services/transaction.service';
+import { TransactionService, TransactionStatus } from '../../business/services/transaction.service';
 import { z } from 'zod';
+import { Decimal } from '@prisma/client/runtime/library';
 
 const transactionService = new TransactionService();
+
+// Helper to serialize Decimal to number
+function serializeDecimals(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  if (obj instanceof Decimal) return obj.toNumber();
+  if (Array.isArray(obj)) return obj.map(serializeDecimals);
+  if (typeof obj === 'object') {
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = serializeDecimals(value);
+    }
+    return result;
+  }
+  return obj;
+}
 
 const createTransactionSchema = z.object({
   externalReference: z.string().optional(),
@@ -32,9 +48,14 @@ export class TransactionController {
       const body = createTransactionSchema.parse(request.body);
       const result = await transactionService.createTransaction(body);
 
+      const serialized = serializeDecimals(result);
+
+      // Remove undefined values to fix JSON serialization
+      const cleaned = JSON.parse(JSON.stringify(serialized));
+
       reply.code(201).send({
         success: true,
-        data: result,
+        data: cleaned,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -62,7 +83,7 @@ export class TransactionController {
 
       reply.code(200).send({
         success: true,
-        data: result,
+        data: serializeDecimals(result),
       });
     } catch (error) {
       reply.code(500).send({
@@ -90,7 +111,7 @@ export class TransactionController {
 
       reply.code(200).send({
         success: true,
-        data: result,
+        data: serializeDecimals(result),
       });
     } catch (error) {
       reply.code(500).send({
@@ -109,6 +130,7 @@ export class TransactionController {
 
       const filters = {
         ...query,
+        status: query.status as TransactionStatus | undefined,
         startDate: query.startDate ? new Date(query.startDate) : undefined,
         endDate: query.endDate ? new Date(query.endDate) : undefined,
       };
@@ -117,7 +139,7 @@ export class TransactionController {
 
       reply.code(200).send({
         success: true,
-        data: result,
+        data: serializeDecimals(result),
         count: result.length,
       });
     } catch (error) {

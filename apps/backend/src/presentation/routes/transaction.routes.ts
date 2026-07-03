@@ -1,7 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { TransactionController } from '../controllers/transaction.controller';
-
-const transactionController = new TransactionController();
+import * as TransactionController from '../controllers/transaction.controller.final';
 
 export async function transactionRoutes(fastify: FastifyInstance) {
   fastify.post(
@@ -23,19 +21,20 @@ export async function transactionRoutes(fastify: FastifyInstance) {
             createdBy: { type: 'string' },
           },
         },
-        response: {
-          201: {
-            description: 'Transaction created successfully',
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              data: { type: 'object' },
-            },
-          },
-        },
+        // Response schema removed to allow full serialization
+        // response: {
+        //   201: {
+        //     description: 'Transaction created successfully',
+        //     type: 'object',
+        //     properties: {
+        //       success: { type: 'boolean' },
+        //       data: { type: 'object' },
+        //     },
+        //   },
+        // },
       },
     },
-    transactionController.createTransaction
+    TransactionController.createTransaction
   );
 
   fastify.post(
@@ -62,7 +61,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    transactionController.settleTransaction
+    TransactionController.settleTransaction
   );
 
   fastify.get(
@@ -89,7 +88,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    transactionController.getTransaction
+    TransactionController.getTransaction
   );
 
   fastify.get(
@@ -122,6 +121,6 @@ export async function transactionRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    transactionController.listTransactions
+    TransactionController.listTransactions
   );
 }

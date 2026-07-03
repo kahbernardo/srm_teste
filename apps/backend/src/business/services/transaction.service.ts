@@ -1,7 +1,15 @@
 import { Decimal } from '@prisma/client/runtime/library';
-import { Transaction, TransactionStatus } from '@prisma/client';
+import { Transaction } from '@prisma/client';
 import prisma from '../../persistence/prisma-client';
 import { PricingStrategyFactory } from '../pricing/pricing-strategy-factory';
+
+// SQLite doesn't support enums, so we define it here
+export enum TransactionStatus {
+  PENDING = 'PENDING',
+  SETTLED = 'SETTLED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+}
 
 export interface CreateTransactionInput {
   externalReference?: string;
