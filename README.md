@@ -1,10 +1,30 @@
 # SRM Credit Engine 💰
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/seu-usuario/srm-credit-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/seu-usuario/srm-credit-engine/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-%E2%89%A580%25-brightgreen)](./apps/backend)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.11.0-brightgreen)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 
 Plataforma robusta de cessão de crédito multimoedas (BRL/USD) para fundos de investimento em direitos creditórios (FIDCs).
+
+## Índice
+
+- [Contexto Empresarial](#-contexto-empresarial)
+- [Funcionalidades](#-funcionalidades-principais)
+- [Setup](#-setup)
+- [Stack](#-stack-técnica)
+- [Arquitetura](#-arquitetura)
+- [Dashboard](#-dashboard)
+- [Git Workflow](#-git-workflow)
+- [Decisões Arquiteturais](#-decisões-arquiteturais)
+- [Modelagem de Dados](#-modelagem-de-dados)
+- [Testes](#-testes)
+- [Observabilidade](#-observabilidade)
+- [Segurança](#-segurança)
+- [Roadmap](#-milestones--roadmap)
+- [AI Usage](#-ai-usage)
+- [Licença](#-licença)
 
 ## 🎯 Contexto Empresarial
 
@@ -17,6 +37,68 @@ A **SRM Asset** opera no mercado de FIDCs, adquirindo ativos financeiros (duplic
 - 🔐 **Transaction Settlement**: Liquidação transacional com garantias ACID
 - 📊 **Operator Dashboard**: Interface para mesas de operação
 - 🔍 **Analytical Queries**: Extrato de liquidação otimizado para grandes volumes
+
+## 🚀 Setup
+
+### Pré-requisitos
+
+- Node.js >= 20.11.0 (verifique com `node -v`)
+- Docker >= 24.0
+- Docker Compose >= 2.20
+- npm >= 10.0
+
+### Instalação
+
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/srm-credit-engine.git
+cd srm-credit-engine
+
+# Instale dependências (workspaces Turborepo)
+npm install
+
+# Configure variáveis de ambiente
+cp apps/backend/.env.example apps/backend/.env
+cp apps/web/.env.example apps/web/.env
+
+# Suba o PostgreSQL via Docker
+npm run docker:up
+
+# Execute migrations e seeds
+npm run db:setup -w apps/backend
+
+# Inicie backend e frontend em modo dev
+npm run dev
+```
+
+### URLs locais
+
+| Serviço | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:4000 |
+| Swagger Docs | http://localhost:4000/docs |
+| Health Check | http://localhost:4000/health |
+
+Guia detalhado: [QUICKSTART.md](./QUICKSTART.md)
+
+### Scripts Disponíveis
+
+```bash
+npm run dev                 # Inicia backend + frontend em modo dev
+npm run dev:backend         # Apenas API
+npm run dev:web             # Apenas frontend
+npm run build               # Build de produção de todos os apps
+npm run lint                # Linting com ESLint
+npm run test                # Testes unitários
+npm run test:integration    # Testes de integração (requer Docker)
+npm run test:coverage       # Testes com coverage report
+npm run format              # Formata código com Prettier
+npm run docker:up           # Sobe PostgreSQL
+npm run docker:down         # Para containers
+npm run db:setup            # Migrations + seeds
+npm run db:studio           # Prisma Studio (GUI do banco)
+```
 
 ## 🏗️ Stack Técnica
 
@@ -31,8 +113,6 @@ Escolhemos uma stack moderna com tipagem forte e ecossistema maduro, adequada pa
 - **ORM**: Prisma (type-safe, migrations declarativas)
 - **Validação**: Zod (schema validation em runtime)
 
-**Justificativa**: Node.js oferece excelente performance para I/O-bound operations (APIs financeiras), enquanto TypeScript garante type safety crítica para operações monetárias. Fastify supera Express em throughput (~20k req/s vs ~15k req/s).
-
 #### Frontend
 - **Framework**: Next.js 14 (App Router)
 - **Linguagem**: TypeScript
@@ -40,14 +120,11 @@ Escolhemos uma stack moderna com tipagem forte e ecossistema maduro, adequada pa
 - **UI Components**: shadcn/ui + Tailwind CSS
 - **Forms**: React Hook Form + Zod
 
-**Justificativa**: Next.js oferece SSR/SSG out-of-the-box, otimizando performance e SEO. shadcn/ui provê componentes acessíveis e customizáveis sem lock-in de biblioteca.
-
 #### Database
-- **SGBD**: PostgreSQL 16+
+- **SGBD**: PostgreSQL 16+ (produção e testes de integração)
+- **Dev local**: SQLite via Prisma (schema alternativo)
 - **Precision**: NUMERIC(18,6) para valores monetários
 - **Migrations**: Prisma Migrate
-
-**Justificativa**: PostgreSQL é o padrão-ouro para aplicações financeiras devido a conformidade ACID robusta, suporte a NUMERIC arbitrary precision (crítico para evitar erros de arredondamento), e performance comprovada em ambientes de produção.
 
 #### DevOps
 - **Containerização**: Docker + Docker Compose
@@ -55,8 +132,6 @@ Escolhemos uma stack moderna com tipagem forte e ecossistema maduro, adequada pa
 - **CI/CD**: GitHub Actions
 - **Linting**: ESLint + Prettier
 - **Git Hooks**: Husky + Commitlint
-
-**Justificativa**: Turborepo otimiza builds em monorepos (até 10x mais rápido que Lerna). Docker garante paridade dev/prod. GitHub Actions oferece integração nativa com repositórios.
 
 ## 🏛️ Arquitetura
 
@@ -77,8 +152,6 @@ srm-credit-engine/
 │           ├── components/      # UI Components
 │           ├── lib/             # Utilities, Hooks
 │           └── services/        # API Clients
-├── packages/
-│   └── shared/           # Types, Schemas, Validations compartilhados
 ├── docs/
 │   ├── adr/              # Architecture Decision Records
 │   └── diagrams/         # C4, ER Diagrams
@@ -102,51 +175,15 @@ srm-credit-engine/
 
 Fontes PlantUML e instruções de regeneração: [docs/diagrams/README.md](./docs/diagrams/README.md)
 
-## 🚀 Quick Start
+## 📊 Dashboard
 
-### Pré-requisitos
+Preview do Operator Dashboard (M3 em andamento):
 
-- Node.js >= 20.11.0 (verifique com `node -v`)
-- Docker >= 24.0
-- Docker Compose >= 2.20
-- npm >= 10.0
+![Dashboard Preview](./docs/screenshots/dashboard-preview.png)
 
-### Instalação
+Documentação interativa da API (Swagger):
 
-```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/srm-credit-engine.git
-cd srm-credit-engine
-
-# Instale dependências (workspaces Turborepo)
-npm install
-
-# Configure variáveis de ambiente
-cp apps/backend/.env.example apps/backend/.env
-cp apps/web/.env.example apps/web/.env
-
-# Suba os serviços (PostgreSQL, Backend, Frontend)
-docker-compose up -d
-
-# Execute migrations
-npm run migrate:dev -w apps/backend
-
-# Acesse a aplicação
-# - Frontend: http://localhost:3000
-# - Backend API: http://localhost:4000
-# - Swagger Docs: http://localhost:4000/docs
-```
-
-### Scripts Disponíveis
-
-```bash
-npm run dev              # Inicia backend + frontend em modo dev
-npm run build            # Build de produção de todos os apps
-npm run lint             # Linting com ESLint
-npm run test             # Executa testes
-npm run test:coverage    # Testes com coverage report
-npm run format           # Formata código com Prettier
-```
+![Swagger API](./docs/screenshots/swagger-api.png)
 
 ## 🔄 Git Workflow
 
@@ -209,9 +246,20 @@ Closes DUP-XXX
 - [ ] Lint/format passou
 ```
 
+## 🗂️ Decisões Arquiteturais
+
+Decisões importantes estão documentadas em ADRs:
+
+- [ADR-001: Stack Selection](./docs/adr/001-stack-selection.md)
+- [ADR-002: SQL vs NoSQL](./docs/adr/002-sql-vs-nosql.md)
+- [ADR-003: Monolith-First Approach](./docs/adr/003-monolith-first.md)
+
+Índice completo: [docs/adr/README.md](./docs/adr/README.md)
+
 ## 📊 Modelagem de Dados
 
 ### ER Diagram
+
 ![ER Diagram](./docs/diagrams/er-diagram.png)
 
 ### Tabelas Principais
@@ -221,6 +269,7 @@ Closes DUP-XXX
 - `asset_types`: Tipos de recebíveis (Duplicata, Cheque, etc)
 - `pricing_strategies`: Configuração de spreads por tipo
 - `transactions`: Registro de liquidações com audit trail
+- `audit_logs`: Trilha de auditoria de alterações
 
 **Precisão Numérica**: Todos os valores monetários usam `NUMERIC(18,6)` para evitar erros de arredondamento de ponto flutuante.
 
@@ -230,26 +279,25 @@ Closes DUP-XXX
 # Rodar testes unitários
 npm run test
 
-# Testes com coverage (mínimo 80%)
+# Testes com coverage (meta mínima 80%)
 npm run test:coverage
 
-# Testes de integração (Testcontainers)
+# Testes de integração (Testcontainers — requer Docker)
 npm run test:integration
 ```
 
 **Estratégia de Testes**:
-- **Unit Tests**: Strategies de precificação, conversão cambial
-- **Integration Tests**: Transações ACID, concorrência
-- **Contract Tests**: Schemas OpenAPI
+- **Unit Tests**: Strategies de precificação, conversão cambial, serviços de domínio
+- **Integration Tests**: Transações ACID, concorrência, endpoints REST (PostgreSQL via Testcontainers)
+- **CI**: Lint, testes unitários e coverage via GitHub Actions (integração roda localmente)
 
 ## 📈 Observabilidade
 
 - **Logs Estruturados**: JSON format com Pino (high-performance logger)
-- **Métricas**: Prometheus-compatible endpoint `/metrics`
-- **Healthchecks**: 
+- **Healthchecks**:
   - `/health` (liveness probe)
-  - `/health/ready` (readiness probe - valida conexão DB)
-- **Correlation ID**: Rastreamento de requests end-to-end
+  - `/health/ready` (readiness probe — valida conexão DB)
+- **Correlation ID**: `request.id` do Fastify propagado em respostas de erro
 
 ## 🔐 Segurança
 
@@ -260,25 +308,16 @@ npm run test:integration
 - ✅ Optimistic Locking (prevenção de race conditions)
 - ✅ Rate Limiting (proteção contra DDoS)
 
-## 🗂️ ADRs (Architecture Decision Records)
-
-Decisões arquiteturais importantes estão documentadas em:
-
-- [ADR-001: Stack Selection](./docs/adr/001-stack-selection.md)
-- [ADR-002: SQL vs NoSQL](./docs/adr/002-sql-vs-nosql.md)
-- [ADR-003: Monolith-First Approach](./docs/adr/003-monolith-first.md)
-- [ADR-004: Pricing Strategy Pattern](./docs/adr/004-pricing-strategy-pattern.md) *(pendente)*
-
 ## 📦 Milestones & Roadmap
 
-- [x] **M0: Foundation** (Semana 1) - Setup completo
-- [ ] **M1: Core Engine MVP** (Semanas 2-3) - Pricing + Settlement
-- [ ] **M2: API Production-Ready** (Semana 4) - Swagger, validations
-- [ ] **M3: Operator Dashboard** (Semana 5) - Frontend completo
-- [ ] **M4: Hardening** (Semana 6) - Observability, security
-- [ ] **M5: Automation** (Semana 7) - CI/CD, docs, v1.0.0
+- [x] **M0: Foundation** (Semana 1) — Setup completo
+- [x] **M1: Core Engine MVP** (Semanas 2-3) — Pricing + Settlement
+- [x] **M2: API Production-Ready** (Semana 4) — Swagger, validations
+- [ ] **M3: Operator Dashboard** (Semana 5) — Frontend completo
+- [x] **M4: Hardening** (Semana 6) — Testes, health checks, rate limiting
+- [x] **M5: Automation & Docs** (Semana 7) — CI/CD, ADRs, diagramas C4, AI_USAGE
 
-Ver [Plano Detalhado](./docs/IMPLEMENTATION_PLAN.md) para breakdown completo de issues.
+Ver [Status de Implementação](./IMPLEMENTATION_STATUS.md) para detalhes do progresso.
 
 ## 🤖 AI Usage
 

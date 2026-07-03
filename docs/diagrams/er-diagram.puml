@@ -1,0 +1,99 @@
+@startuml er-diagram
+!theme plain
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+
+title SRM Credit Engine - Entity Relationship Diagram
+
+entity "currencies" as currencies {
+  * id : UUID <<PK>>
+  --
+  * code : VARCHAR <<UK>>
+  * name : VARCHAR
+  * symbol : VARCHAR
+  * active : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "exchange_rates" as exchange_rates {
+  * id : UUID <<PK>>
+  --
+  * from_currency_id : UUID <<FK>>
+  * to_currency_id : UUID <<FK>>
+  * rate : NUMERIC(18,6)
+  * valid_from : TIMESTAMP
+  valid_until : TIMESTAMP
+  * source : VARCHAR
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "asset_types" as asset_types {
+  * id : UUID <<PK>>
+  --
+  * code : VARCHAR <<UK>>
+  * name : VARCHAR
+  description : TEXT
+  * active : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "pricing_strategies" as pricing_strategies {
+  * id : UUID <<PK>>
+  --
+  * asset_type_id : UUID <<FK>>
+  * strategy_name : VARCHAR
+  * base_spread : NUMERIC
+  * min_spread : NUMERIC
+  * max_spread : NUMERIC
+  * risk_multiplier : NUMERIC
+  * valid_from : TIMESTAMP
+  valid_until : TIMESTAMP
+  * active : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "transactions" as transactions {
+  * id : UUID <<PK>>
+  --
+  external_reference : VARCHAR
+  * asset_type_id : UUID <<FK>>
+  * currency_id : UUID <<FK>>
+  * face_value : NUMERIC(18,6)
+  * days_to_maturity : INT
+  * discount_rate : NUMERIC
+  * discount_amount : NUMERIC(18,6)
+  * net_amount : NUMERIC(18,6)
+  exchange_rate_applied : NUMERIC(18,6)
+  converted_amount : NUMERIC(18,6)
+  target_currency_id : UUID
+  * status : ENUM
+  settled_at : TIMESTAMP
+  * created_by : VARCHAR
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+  * version : INT
+}
+
+entity "audit_logs" as audit_logs {
+  * id : UUID <<PK>>
+  --
+  * entity_type : VARCHAR
+  * entity_id : UUID
+  * action : VARCHAR
+  changes : JSONB
+  * performed_by : VARCHAR
+  performed_at : TIMESTAMP
+  ip_address : VARCHAR
+}
+
+currencies ||--o{ exchange_rates : "from"
+currencies ||--o{ exchange_rates : "to"
+currencies ||--o{ transactions : "currency"
+asset_types ||--o{ pricing_strategies : "has"
+asset_types ||--o{ transactions : "type"
+
+@enduml

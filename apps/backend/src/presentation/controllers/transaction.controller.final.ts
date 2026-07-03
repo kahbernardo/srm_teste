@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { TransactionService, TransactionStatus } from '../../business/services/transaction.service';
 import { z } from 'zod';
-import { NotFoundError, ValidationError } from '../errors';
+import { NotFoundError } from '../errors';
 
 const transactionService = new TransactionService();
 
@@ -35,7 +35,7 @@ export async function createTransaction(request: FastifyRequest, reply: FastifyR
   };
 }
 
-export async function settleTransaction(request: FastifyRequest, reply: FastifyReply) {
+export async function settleTransaction(request: FastifyRequest, _reply: FastifyReply) {
   const { transactionId } = request.params as { transactionId: string };
   const result = await transactionService.settleTransaction(transactionId);
 
@@ -45,7 +45,7 @@ export async function settleTransaction(request: FastifyRequest, reply: FastifyR
   };
 }
 
-export async function getTransaction(request: FastifyRequest, reply: FastifyReply) {
+export async function getTransaction(request: FastifyRequest, _reply: FastifyReply) {
   const { transactionId } = request.params as { transactionId: string };
   const result = await transactionService.getTransaction(transactionId);
 
@@ -59,7 +59,7 @@ export async function getTransaction(request: FastifyRequest, reply: FastifyRepl
   };
 }
 
-export async function listTransactions(request: FastifyRequest, reply: FastifyReply) {
+export async function listTransactions(request: FastifyRequest, _reply: FastifyReply) {
   const query = listTransactionsSchema.parse(request.query);
 
   const filters = {

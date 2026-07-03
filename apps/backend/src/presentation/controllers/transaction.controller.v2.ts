@@ -72,7 +72,7 @@ export async function settleTransaction(
 
 export async function getTransaction(
   request: FastifyRequest,
-  reply: FastifyReply
+  _reply: FastifyReply
 ) {
   const { transactionId } = request.params as { transactionId: string };
   const result = await transactionService.getTransaction(transactionId);
