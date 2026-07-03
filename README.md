@@ -262,9 +262,10 @@ npm run test:integration
 
 Decisões arquiteturais importantes estão documentadas em:
 
-- [ADR-001: Stack Selection (SQL vs NoSQL, Node.js vs Go)](./docs/adr/001-stack-selection.md)
-- [ADR-002: Monolith-First Approach](./docs/adr/002-monolith-first.md)
-- [ADR-003: Pricing Strategy Pattern](./docs/adr/003-pricing-strategy-pattern.md)
+- [ADR-001: Stack Selection](./docs/adr/001-stack-selection.md)
+- [ADR-002: SQL vs NoSQL](./docs/adr/002-sql-vs-nosql.md)
+- [ADR-003: Monolith-First Approach](./docs/adr/003-monolith-first.md)
+- [ADR-004: Pricing Strategy Pattern](./docs/adr/004-pricing-strategy-pattern.md) *(pendente)*
 
 ## 📦 Milestones & Roadmap
 

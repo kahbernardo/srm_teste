@@ -60,6 +60,8 @@ Precisávamos decidir:
 **Escolhido**: PostgreSQL  
 **Rejeitados**: MySQL, MongoDB, CockroachDB
 
+> Análise detalhada SQL vs NoSQL: ver [ADR-002](./002-sql-vs-nosql.md)
+
 **Razões**:
 ✅ **ACID Compliance**: Isolamento SERIALIZABLE para transações financeiras  
 ✅ **NUMERIC Type**: Precision arbitrária (NUMERIC(18,6)) sem erros de float  
@@ -72,10 +74,11 @@ Precisávamos decidir:
 ❌ **Horizontal Scaling**: MySQL tem Vitess, Postgres tem Citus (mais complexo)  
 ❌ **Write throughput**: MongoDB seria superior para writes massivos (não é nosso caso)
 
-**Por que NÃO NoSQL**:
-- **ACID**: MongoDB só garante ACID em single-document (precisamos de multi-table transactions)
-- **Schema Enforcement**: Precisamos de foreign keys e constraints para integridade referencial
-- **Decimal Precision**: MongoDB usa IEEE 754 floats (erros de arredondamento inaceitáveis)
+**Por que NÃO NoSQL** (detalhes em ADR-002):
+
+- ACID multi-tabela necessário para liquidação financeira
+- Foreign keys e constraints para integridade referencial
+- Precisão decimal via `NUMERIC`, não floats IEEE 754
 
 ### ORM: Prisma
 
