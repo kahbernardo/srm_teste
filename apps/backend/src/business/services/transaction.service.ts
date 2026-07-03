@@ -1,5 +1,5 @@
 import { Decimal } from '@prisma/client/runtime/library';
-import { Transaction } from '@prisma/client';
+import { PrismaClient, Transaction } from '@prisma/client';
 import prisma from '../../persistence/prisma-client';
 import { PricingStrategyFactory } from '../pricing/pricing-strategy-factory';
 import { NotFoundError, BusinessError } from '../../presentation/errors';
@@ -34,8 +34,10 @@ export interface TransactionResult {
 }
 
 export class TransactionService {
+  constructor(private readonly db: PrismaClient = prisma) {}
+
   async createTransaction(input: CreateTransactionInput): Promise<TransactionResult> {
-    return await prisma.$transaction(async (tx) => {
+    return await this.db.$transaction(async (tx) => {
       // 1. Buscar tipo de ativo e estratégia de pricing ativa
       const assetType = await tx.assetType.findUnique({
         where: { id: input.assetTypeId },
@@ -129,7 +131,7 @@ export class TransactionService {
   }
 
   async settleTransaction(transactionId: string): Promise<Transaction> {
-    return await prisma.$transaction(async (tx) => {
+    return await this.db.$transaction(async (tx) => {
       const transaction = await tx.transaction.findUnique({
         where: { id: transactionId },
       });
@@ -157,7 +159,7 @@ export class TransactionService {
   }
 
   async getTransaction(transactionId: string): Promise<Transaction | null> {
-    return await prisma.transaction.findUnique({
+    return await this.db.transaction.findUnique({
       where: { id: transactionId },
       include: {
         assetType: true,
@@ -185,7 +187,7 @@ export class TransactionService {
       if (filters.endDate) where.createdAt.lte = filters.endDate;
     }
 
-    return await prisma.transaction.findMany({
+    return await this.db.transaction.findMany({
       where,
       include: {
         assetType: true,

@@ -11,6 +11,9 @@
     "lint": "eslint src --ext .ts",
     "test": "vitest run",
     "test:watch": "vitest",
+    "pretest:integration": "prisma generate --schema=./prisma/schema.prisma.postgres",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:all": "vitest run && vitest run --config vitest.integration.config.ts",
     "test:coverage": "vitest run --coverage",
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
@@ -38,12 +41,15 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@testcontainers/postgresql": "^10.28.0",
     "@types/node": "^20.11.0",
     "@typescript-eslint/eslint-plugin": "^6.18.1",
     "@typescript-eslint/parser": "^6.18.1",
     "@vitest/coverage-v8": "^1.2.0",
     "eslint": "^8.56.0",
+    "pg": "^8.22.0",
     "prisma": "^5.8.0",
+    "testcontainers": "^10.28.0",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3",
     "vitest": "^1.2.0"
