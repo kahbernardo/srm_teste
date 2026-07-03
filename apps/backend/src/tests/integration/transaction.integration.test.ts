@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import { TransactionService } from '../../business/services/transaction.service';
 import { NotFoundError, BusinessError } from '../../presentation/errors';
+import { querySettlementExtract } from '../../persistence/repositories/settlementExtract.repository';
 import { getTestPrisma, cleanDatabase } from './setup';
 
 describe('Transaction Integration Tests', () => {
@@ -149,9 +150,15 @@ describe('Transaction Integration Tests', () => {
       expect(Number(transaction?.faceValue)).toBe(10000);
       expect(transaction?.daysToMaturity).toBe(90);
 
-      expect(Number(transaction!.discountRate)).toBeCloseTo(0.00375, 6);
-      expect(Number(transaction!.discountAmount)).toBeCloseTo(37.5, 2);
-      expect(Number(transaction!.netAmount)).toBeCloseTo(9962.5, 2);
+      expect(Number(transaction!.discountRate)).toBeCloseTo(0.043683, 4);
+      expect(Number(transaction!.discountAmount)).toBeCloseTo(436.83, 1);
+      expect(Number(transaction!.netAmount)).toBeCloseTo(9563.17, 1);
+
+      const auditEntries = await prisma.auditLog.findMany({
+        where: { entityId: result.id, action: 'CREATE' },
+      });
+      expect(auditEntries).toHaveLength(1);
+      expect(auditEntries[0].performedBy).toBe('test-user');
     });
 
     it('should create transaction with currency conversion', async () => {
@@ -370,6 +377,65 @@ describe('Transaction Integration Tests', () => {
     it('should verify cleanup worked', async () => {
       const count = await prisma.transaction.count();
       expect(count).toBe(0);
+    });
+  });
+
+  describe('Settlement Extract (native SQL)', () => {
+    it('should return only settled transactions filtered by cedente', async () => {
+      const pending = await transactionService.createTransaction({
+        assetTypeId: assetTypeDuplicata.id,
+        currencyId: currencyBRL.id,
+        faceValue: 5000,
+        daysToMaturity: 30,
+        createdBy: 'cedente-alpha',
+      });
+
+      const toSettle = await transactionService.createTransaction({
+        assetTypeId: assetTypeDuplicata.id,
+        currencyId: currencyBRL.id,
+        faceValue: 10000,
+        daysToMaturity: 90,
+        createdBy: 'cedente-beta',
+      });
+
+      await transactionService.settleTransaction(toSettle.id);
+
+      const extract = await querySettlementExtract(
+        { cedente: 'cedente-beta', page: 1, pageSize: 20 },
+        prisma as unknown as PrismaClient
+      );
+
+      expect(extract.total).toBe(1);
+      expect(extract.data[0].id).toBe(toSettle.id);
+      expect(extract.data[0].created_by).toBe('cedente-beta');
+
+      const pendingStill = await prisma.transaction.findUnique({ where: { id: pending.id } });
+      expect(pendingStill?.status).toBe('PENDING');
+    });
+
+    it('should filter settlement extract by currency', async () => {
+      const tx = await transactionService.createTransaction({
+        assetTypeId: assetTypeDuplicata.id,
+        currencyId: currencyUSD.id,
+        faceValue: 8000,
+        daysToMaturity: 60,
+        createdBy: 'cedente-usd',
+      });
+
+      await transactionService.settleTransaction(tx.id);
+
+      const brlOnly = await querySettlementExtract(
+        { currencyId: currencyBRL.id },
+        prisma as unknown as PrismaClient
+      );
+      const usdOnly = await querySettlementExtract(
+        { currencyId: currencyUSD.id },
+        prisma as unknown as PrismaClient
+      );
+
+      expect(brlOnly.total).toBe(0);
+      expect(usdOnly.total).toBe(1);
+      expect(usdOnly.data[0].currency_code).toBe('USD');
     });
   });
 });

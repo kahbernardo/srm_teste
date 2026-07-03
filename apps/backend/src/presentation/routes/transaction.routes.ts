@@ -73,16 +73,6 @@ export async function transactionRoutes(fastify: FastifyInstance) {
             transactionId: { type: 'string', format: 'uuid' },
           },
         },
-        response: {
-          200: {
-            description: 'Transaction settled successfully',
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              data: { type: 'object' },
-            },
-          },
-        },
       },
     },
     TransactionController.settleTransaction
@@ -98,16 +88,6 @@ export async function transactionRoutes(fastify: FastifyInstance) {
           type: 'object',
           properties: {
             transactionId: { type: 'string', format: 'uuid' },
-          },
-        },
-        response: {
-          200: {
-            description: 'Transaction found',
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              data: { type: 'object' },
-            },
           },
         },
       },
@@ -127,6 +107,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
             status: { type: 'string', enum: ['PENDING', 'SETTLED', 'FAILED', 'CANCELLED'] },
             currencyId: { type: 'string', format: 'uuid' },
             assetTypeId: { type: 'string', format: 'uuid' },
+            createdBy: { type: 'string' },
             startDate: { type: 'string', format: 'date-time' },
             endDate: { type: 'string', format: 'date-time' },
             limit: { type: 'integer', minimum: 1, maximum: 1000 },

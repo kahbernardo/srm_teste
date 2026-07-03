@@ -46,6 +46,16 @@ export function FilterPanel() {
       </select>
 
       <input
+        type="text"
+        placeholder="Cedente"
+        value={filters.cedente ?? ''}
+        onChange={(e) =>
+          setFilters({ cedente: e.target.value || undefined, page: 1 })
+        }
+        className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+      />
+
+      <input
         type="date"
         value={filters.startDate?.slice(0, 10) ?? ''}
         onChange={(e) =>

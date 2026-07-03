@@ -117,7 +117,7 @@ Escolhemos uma stack moderna com tipagem forte e ecossistema maduro, adequada pa
 - **Framework**: Next.js 14 (App Router)
 - **Linguagem**: TypeScript
 - **State Management**: Zustand (lightweight, type-safe)
-- **UI Components**: shadcn/ui + Tailwind CSS
+- **UI Components**: Tailwind CSS
 - **Forms**: React Hook Form + Zod
 
 #### Database
@@ -227,16 +227,13 @@ docs(readme): add setup instructions
 test(currency): add unit tests for exchange rate calculation
 ```
 
-**Validação**: Commitlint bloqueia commits fora do padrão via Husky pre-commit hook.
+**Validação**: Commitlint bloqueia commits fora do padrão via Husky commit-msg hook.
 
 ### Pull Request Template
 
 ```markdown
 ## Descrição
 [Descreva o que foi feito]
-
-## Issue Linear
-Closes DUP-XXX
 
 ## Checklist
 - [ ] Testes adicionados/atualizados
@@ -276,6 +273,8 @@ Decisões importantes estão documentadas em ADRs:
 - `audit_logs`: Trilha de auditoria de alterações
 
 **Precisão Numérica**: Todos os valores monetários usam `NUMERIC(18,6)` para evitar erros de arredondamento de ponto flutuante.
+
+**Scripts DDL**: [docs/database/schema.ddl.sql](./docs/database/schema.ddl.sql)
 
 ## 🧪 Testes
 
@@ -350,6 +349,5 @@ Este projeto está sob a licença MIT. Ver arquivo [LICENSE](./LICENSE).
 ## 🔗 Links Úteis
 
 - [Documentação da API (Swagger)](http://localhost:4000/docs)
-- [Linear Project](https://linear.app/dupappbr/project/srm-credit-engine-f7e7a0ea1750)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [Turborepo Docs](https://turbo.build/repo/docs)

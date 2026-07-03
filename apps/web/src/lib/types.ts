@@ -58,10 +58,27 @@ export interface TransactionFilters {
   status?: string;
   currencyId?: string;
   assetTypeId?: string;
+  cedente?: string;
   startDate?: string;
   endDate?: string;
   page?: number;
   pageSize?: number;
+}
+
+export interface SettlementExtractRow {
+  id: string;
+  external_reference: string | null;
+  face_value: number;
+  discount_amount: number;
+  net_amount: number;
+  converted_amount: number | null;
+  settled_at: string | null;
+  created_by: string;
+  created_at: string;
+  asset_code: string;
+  asset_name: string;
+  currency_code: string;
+  currency_symbol: string;
 }
 
 export interface CreateTransactionInput {

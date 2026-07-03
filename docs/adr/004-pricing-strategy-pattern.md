@@ -25,13 +25,17 @@ Adotar o **Strategy Pattern** com **Factory** para o motor de precificação:
 - `PricingStrategyFactory` resolve a estratégia pelo `strategyName` configurado no banco
 - Configuração de spreads em `pricing_strategies` (baseSpread, riskMultiplier, validFrom)
 
-Fórmula base (ano comercial 360 dias):
+Fórmula base (juros compostos, spread mensal conforme enunciado):
 
 ```
-taxa_desconto = (base_spread * risk_multiplier) * (dias / 360)
-deságio = valor_face * taxa_desconto
-valor_líquido = valor_face - deságio
+taxa_mensal = base_spread * risk_multiplier
+prazo_meses = dias_ate_vencimento / 30
+valor_presente = valor_face / (1 + taxa_mensal) ^ prazo_meses
+deságio = valor_face - valor_presente
+taxa_desconto_efetiva = deságio / valor_face
 ```
+
+Implementação compartilhada em `compoundPricing.ts`, reutilizada por `DuplicataStrategy` e `ChequeStrategy`. O prêmio de risco do Cheque vem do `riskMultiplier` configurado no seed (ex: 1.2), sem multiplicador hardcoded adicional.
 
 ## Consequences
 

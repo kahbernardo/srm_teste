@@ -14,6 +14,7 @@ import { fetchAssetTypes, fetchCurrencies } from '../services/referenceDataServi
 import {
   createTransaction,
   listTransactions,
+  loadSettlementGrid,
   settleTransaction,
   simulateTransaction,
 } from '../services/transactionService';
@@ -62,7 +63,11 @@ export const useOperatorStore = create<OperatorState>((set, get) => ({
   loadTransactions: async () => {
     set({ loading: true, error: null });
     try {
-      const { data, pagination } = await listTransactions(get().filters);
+      const filters = get().filters;
+      const useExtract = filters.status === 'SETTLED';
+      const { data, pagination } = useExtract
+        ? await loadSettlementGrid(filters)
+        : await listTransactions(filters);
       set({ transactions: data, pagination, loading: false });
     } catch (err) {
       set({

@@ -6,6 +6,7 @@ import { NotFoundError, BusinessError } from '../../presentation/errors';
 import { eventStore } from '../../events/eventStore';
 import { DomainEventTypes } from '../../events/domainEventTypes';
 import { metrics } from '../../monitoring/metrics';
+import { auditLogRepository } from '../../persistence/auditLog.repository';
 
 export enum TransactionStatus {
   PENDING = 'PENDING',
@@ -186,6 +187,22 @@ export class TransactionService {
         },
       });
 
+      await auditLogRepository.create(
+        {
+          entityType: 'Transaction',
+          entityId: transaction.id,
+          action: 'CREATE',
+          changes: {
+            faceValue: input.faceValue,
+            assetTypeId: input.assetTypeId,
+            createdBy: input.createdBy,
+            status: 'PENDING',
+          },
+          performedBy: input.createdBy,
+        },
+        tx
+      );
+
       metrics.transactionsTotal.inc({
         status: 'PENDING',
         currency: transaction.currency.code,
@@ -251,6 +268,21 @@ export class TransactionService {
         },
       });
 
+      await auditLogRepository.create(
+        {
+          entityType: 'Transaction',
+          entityId: transactionId,
+          action: 'SETTLE',
+          changes: {
+            status: 'SETTLED',
+            settledAt: settled.settledAt?.toISOString(),
+            netAmount: transaction.netAmount,
+          },
+          performedBy: transaction.createdBy,
+        },
+        tx
+      );
+
       metrics.transactionsTotal.inc({
         status: 'SETTLED',
         currency: transaction.currency.code,
@@ -275,6 +307,7 @@ export class TransactionService {
     status?: TransactionStatus;
     currencyId?: string;
     assetTypeId?: string;
+    createdBy?: string;
     startDate?: Date;
     endDate?: Date;
     page?: number;
@@ -286,6 +319,7 @@ export class TransactionService {
     if (filters?.status) where.status = filters.status;
     if (filters?.currencyId) where.currencyId = filters.currencyId;
     if (filters?.assetTypeId) where.assetTypeId = filters.assetTypeId;
+    if (filters?.createdBy) where.createdBy = filters.createdBy;
     if (filters?.startDate || filters?.endDate) {
       where.createdAt = {};
       if (filters.startDate) (where.createdAt as Record<string, Date>).gte = filters.startDate;

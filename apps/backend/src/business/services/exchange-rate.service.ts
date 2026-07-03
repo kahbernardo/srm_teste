@@ -20,7 +20,7 @@ export class ExchangeRateService {
     toCurrencyId: string
   ): Promise<ExchangeRate | null> {
     const key = cacheKey(['exchange-rate', fromCurrencyId, toCurrencyId]);
-    const cached = getCached<ExchangeRate>(key);
+    const cached = await getCached<ExchangeRate>(key);
     if (cached) return cached;
 
     const rate = await exchangeRateCircuitBreaker.execute(
@@ -41,7 +41,7 @@ export class ExchangeRateService {
       () => null
     );
 
-    if (rate) setCached(key, rate, 60);
+    if (rate) await setCached(key, rate, 60);
     return rate;
   }
 

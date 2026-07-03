@@ -30,6 +30,27 @@ No editor interativo:
 
 Resultado: histórico linear e legível na `main`.
 
+## Demonstração gravada: branch `demo/git-crisis-revert`
+
+A branch `demo/git-crisis-revert` contém uma simulação real de crise:
+
+1. Commit com bug intencional na fórmula de deságio (`BUG_DEMO`)
+2. Commit de `git revert` desfazendo o bug com histórico auditável
+
+Para inspecionar:
+
+```bash
+git fetch origin demo/git-crisis-revert
+git log --oneline demo/git-crisis-revert -5
+```
+
+Commits na branch `demo/git-crisis-revert` (após push):
+
+| SHA | Mensagem |
+|-----|----------|
+| `cf8c089` | `fix(pricing): bug demo desagio incorreto em compound pricing` |
+| `4584449` | `Revert "fix(pricing): bug demo desagio incorreto em compound pricing"` |
+
 ## Simulação de Gestão de Crise
 
 ### Cenário: Bug crítico em produção

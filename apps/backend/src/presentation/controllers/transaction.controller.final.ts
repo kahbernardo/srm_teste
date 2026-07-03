@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { TransactionService, TransactionStatus } from '../../business/services/transaction.service';
 import { z } from 'zod';
 import { NotFoundError } from '../errors';
+import { serializeForResponse } from '../utils/responseSerializer';
 
 const transactionService = new TransactionService();
 
@@ -19,6 +20,7 @@ const listTransactionsSchema = z.object({
   status: z.enum(['PENDING', 'SETTLED', 'FAILED', 'CANCELLED']).optional(),
   currencyId: z.string().uuid().optional(),
   assetTypeId: z.string().uuid().optional(),
+  createdBy: z.string().min(1).optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
   page: z.coerce.number().int().positive().optional(),
@@ -33,7 +35,7 @@ export async function createTransaction(request: FastifyRequest, reply: FastifyR
   reply.status(201);
   return {
     success: true,
-    data: result,
+    data: serializeForResponse(result),
   };
 }
 
@@ -43,7 +45,7 @@ export async function settleTransaction(request: FastifyRequest, _reply: Fastify
 
   return {
     success: true,
-    data: result,
+    data: serializeForResponse(result),
   };
 }
 
@@ -57,7 +59,7 @@ export async function getTransaction(request: FastifyRequest, _reply: FastifyRep
 
   return {
     success: true,
-    data: result,
+    data: serializeForResponse(result),
   };
 }
 
@@ -75,7 +77,7 @@ export async function listTransactions(request: FastifyRequest, _reply: FastifyR
 
   return {
     success: true,
-    data: result.data,
+    data: serializeForResponse(result.data),
     pagination: {
       total: result.total,
       page: result.page,
@@ -91,6 +93,6 @@ export async function simulateTransaction(request: FastifyRequest, _reply: Fasti
 
   return {
     success: true,
-    data: result,
+    data: serializeForResponse(result),
   };
 }

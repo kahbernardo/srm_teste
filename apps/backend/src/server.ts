@@ -10,6 +10,7 @@ import { assetTypeRoutes } from './presentation/routes/asset-type.routes';
 import { exchangeRateRoutes } from './presentation/routes/exchange-rate.routes';
 import { eventRoutes } from './presentation/routes/event.routes';
 import { metricsRoutes } from './presentation/routes/metrics.routes';
+import { reportRoutes } from './presentation/routes/report.routes';
 import { errorHandler } from './presentation/middlewares/error-handler';
 import { metrics } from './monitoring/metrics';
 import { initTracing, shutdownTracing } from './monitoring/tracing';
@@ -83,6 +84,7 @@ async function start() {
           { name: 'currencies', description: 'Currency management' },
           { name: 'asset-types', description: 'Asset type management' },
           { name: 'exchange-rates', description: 'Exchange rate management' },
+          { name: 'reports', description: 'Analytical reports' },
           { name: 'health', description: 'Health check endpoints' },
         ],
       },
@@ -178,6 +180,7 @@ async function start() {
     await server.register(assetTypeRoutes, { prefix: '/api/v1' });
     await server.register(exchangeRateRoutes, { prefix: '/api/v1' });
     await server.register(eventRoutes, { prefix: '/api/v1' });
+    await server.register(reportRoutes, { prefix: '/api/v1' });
     await server.register(metricsRoutes);
 
     server.addHook('onResponse', async (request, reply) => {
