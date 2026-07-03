@@ -7,7 +7,42 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
-### Added (03/07/2026)
+## [1.0.0] - 2026-07-03
+
+### Added
+
+#### Frontend — Operator Dashboard (M3)
+- Painel do operador com formulário de recebível e simulação em tempo real
+- Grid de transações com paginação server-side e filtros dinâmicos
+- Zustand store + API client services
+- Endpoint `POST /api/v1/transactions/simulate`
+
+#### Observabilidade
+- Endpoint `/metrics` com métricas Prometheus financeiras
+- Grafana + Prometheus + Jaeger no docker-compose
+- Tracing estruturado com spans (`OTEL_ENABLED`)
+
+#### Event Sourcing
+- Tabela `domain_events` e Event Store
+- Eventos: TransactionCreated, TransactionPriced, TransactionSettled, ExchangeRateUpdated
+- API `GET /api/v1/events`
+
+#### Infraestrutura
+- Manifests Kubernetes (`k8s/`) com HPA
+- Circuit breaker para taxas de câmbio
+- Cache in-memory para exchange rates (TTL 60s)
+
+#### Documentação Especialista
+- ADR-004 a ADR-007
+- Arquitetura de alta escala (1M tx/min)
+- Runbooks operacionais
+- Git workflow avançado (rebase, revert, cherry-pick)
+
+### Changed
+- Paginação server-side em `GET /api/v1/transactions`
+- Roadmap M3 marcado como concluído
+
+## [Unreleased - histórico anterior]
 
 #### Backend API Completo
 - **Pricing Engine** com Strategy Pattern

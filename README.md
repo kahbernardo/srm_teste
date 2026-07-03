@@ -253,6 +253,10 @@ Decisões importantes estão documentadas em ADRs:
 - [ADR-001: Stack Selection](./docs/adr/001-stack-selection.md)
 - [ADR-002: SQL vs NoSQL](./docs/adr/002-sql-vs-nosql.md)
 - [ADR-003: Monolith-First Approach](./docs/adr/003-monolith-first.md)
+- [ADR-004: Pricing Strategy Pattern](./docs/adr/004-pricing-strategy-pattern.md)
+- [ADR-005: Event Sourcing vs CRUD](./docs/adr/005-event-sourcing-vs-crud.md)
+- [ADR-006: Microservices vs Modular Monolith](./docs/adr/006-microservices-vs-monolith.md)
+- [ADR-007: Sync vs Async Processing](./docs/adr/007-sync-vs-async.md)
 
 Índice completo: [docs/adr/README.md](./docs/adr/README.md)
 
@@ -294,10 +298,15 @@ npm run test:integration
 ## 📈 Observabilidade
 
 - **Logs Estruturados**: JSON format com Pino (high-performance logger)
+- **Métricas Prometheus**: endpoint `/metrics` (transações, precificação, HTTP)
+- **Tracing**: Jaeger via `OTEL_ENABLED=true` (docker-compose)
+- **Dashboards**: Grafana em http://localhost:3001
 - **Healthchecks**:
   - `/health` (liveness probe)
   - `/health/ready` (readiness probe — valida conexão DB)
 - **Correlation ID**: `request.id` do Fastify propagado em respostas de erro
+
+Guia: [docs/runbooks/deploymentGuide.md](./docs/runbooks/deploymentGuide.md)
 
 ## 🔐 Segurança
 
@@ -313,11 +322,11 @@ npm run test:integration
 - [x] **M0: Foundation** (Semana 1) — Setup completo
 - [x] **M1: Core Engine MVP** (Semanas 2-3) — Pricing + Settlement
 - [x] **M2: API Production-Ready** (Semana 4) — Swagger, validations
-- [ ] **M3: Operator Dashboard** (Semana 5) — Frontend completo
+- [x] **M3: Operator Dashboard** (Semana 5) — Frontend completo
 - [x] **M4: Hardening** (Semana 6) — Testes, health checks, rate limiting
 - [x] **M5: Automation & Docs** (Semana 7) — CI/CD, ADRs, diagramas C4, AI_USAGE
 
-Ver [Status de Implementação](./IMPLEMENTATION_STATUS.md) para detalhes do progresso.
+Ver [Status de Implementação](./IMPLEMENTATION_STATUS.md) e [Arquitetura de Alta Escala](./docs/architecture/highScaleArchitecture.md).
 
 ## 🤖 AI Usage
 

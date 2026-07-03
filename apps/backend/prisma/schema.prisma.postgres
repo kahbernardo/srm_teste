@@ -153,10 +153,10 @@ model Transaction {
 
 model AuditLog {
   id          String   @id @default(uuid())
-  entityType  String   @map("entity_type") @db.VarChar(50) // Transaction, ExchangeRate, etc
+  entityType  String   @map("entity_type") @db.VarChar(50)
   entityId    String   @map("entity_id")
-  action      String   @db.VarChar(20) // CREATE, UPDATE, DELETE
-  changes     Json?    // JSON com before/after
+  action      String   @db.VarChar(20)
+  changes     Json?
   performedBy String   @map("performed_by") @db.VarChar(100)
   performedAt DateTime @default(now()) @map("performed_at") @db.Timestamptz
   ipAddress   String?  @map("ip_address") @db.VarChar(45)
@@ -164,4 +164,18 @@ model AuditLog {
   @@index([entityType, entityId])
   @@index([performedAt])
   @@map("audit_logs")
+}
+
+model DomainEvent {
+  id            String   @id @default(uuid())
+  aggregateId   String   @map("aggregate_id")
+  aggregateType String   @map("aggregate_type") @db.VarChar(50)
+  eventType     String   @map("event_type") @db.VarChar(100)
+  payload       Json
+  version       Int      @default(1)
+  occurredAt    DateTime @default(now()) @map("occurred_at") @db.Timestamptz
+
+  @@index([aggregateId, aggregateType])
+  @@index([occurredAt])
+  @@map("domain_events")
 }

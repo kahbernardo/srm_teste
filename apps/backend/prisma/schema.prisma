@@ -115,3 +115,17 @@ model AuditLog {
 
   @@map("audit_logs")
 }
+
+model DomainEvent {
+  id            String   @id @default(uuid())
+  aggregateId   String   @map("aggregate_id")
+  aggregateType String   @map("aggregate_type")
+  eventType     String   @map("event_type")
+  payload       String
+  version       Int      @default(1)
+  occurredAt    DateTime @default(now()) @map("occurred_at")
+
+  @@index([aggregateId, aggregateType])
+  @@index([occurredAt])
+  @@map("domain_events")
+}

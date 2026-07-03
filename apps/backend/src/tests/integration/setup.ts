@@ -26,6 +26,7 @@ export function getTestPrisma(): PrismaClient {
 
 export async function cleanDatabase(): Promise<void> {
   const prisma = getTestPrisma();
+  await prisma.domainEvent.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.transaction.deleteMany();
   await prisma.pricingStrategy.deleteMany();

@@ -21,7 +21,9 @@ const listTransactionsSchema = z.object({
   assetTypeId: z.string().uuid().optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
-  limit: z.number().int().positive().max(1000).optional(),
+  page: z.coerce.number().int().positive().optional(),
+  pageSize: z.coerce.number().int().positive().max(100).optional(),
+  limit: z.coerce.number().int().positive().max(1000).optional(),
 });
 
 export async function createTransaction(request: FastifyRequest, reply: FastifyReply) {
@@ -73,7 +75,22 @@ export async function listTransactions(request: FastifyRequest, _reply: FastifyR
 
   return {
     success: true,
+    data: result.data,
+    pagination: {
+      total: result.total,
+      page: result.page,
+      pageSize: result.pageSize,
+      totalPages: result.totalPages,
+    },
+  };
+}
+
+export async function simulateTransaction(request: FastifyRequest, _reply: FastifyReply) {
+  const body = createTransactionSchema.parse(request.body);
+  const result = await transactionService.simulateTransaction(body);
+
+  return {
+    success: true,
     data: result,
-    count: result.length,
   };
 }

@@ -1,0 +1,43 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "panels": [
+    {
+      "title": "Transações por Status",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (status) (srm_transactions_total)",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    },
+    {
+      "title": "Duração de Precificação (p95)",
+      "type": "graph",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(srm_pricing_calculation_duration_seconds_bucket[5m])) by (le, strategy))",
+          "legendFormat": "{{strategy}}"
+        }
+      ]
+    },
+    {
+      "title": "HTTP Requests",
+      "type": "graph",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(srm_http_requests_total[5m])) by (route, status)",
+          "legendFormat": "{{route}} {{status}}"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "title": "SRM Credit Engine",
+  "uid": "srm-credit-engine",
+  "version": 1
+}

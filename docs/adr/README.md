@@ -7,7 +7,10 @@ Registro de decisões arquiteturais do SRM Credit Engine.
 | [001](./001-stack-selection.md) | Stack Selection | Accepted | 2026-07-03 |
 | [002](./002-sql-vs-nosql.md) | SQL vs NoSQL | Accepted | 2026-07-03 |
 | [003](./003-monolith-first.md) | Monolith-First Approach | Accepted | 2026-07-03 |
-| 004 | Pricing Strategy Pattern | Pendente | — |
+| [004](./004-pricing-strategy-pattern.md) | Pricing Strategy Pattern | Accepted | 2026-07-03 |
+| [005](./005-event-sourcing-vs-crud.md) | Event Sourcing vs CRUD | Accepted | 2026-07-03 |
+| [006](./006-microservices-vs-monolith.md) | Microservices vs Modular Monolith | Accepted | 2026-07-03 |
+| [007](./007-sync-vs-async.md) | Synchronous vs Asynchronous Processing | Accepted | 2026-07-03 |
 
 ## Formato
 

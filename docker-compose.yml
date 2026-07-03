@@ -71,6 +71,54 @@ services:
   #     - srm-network
   #   command: npm run dev
 
+  redis:
+    image: redis:7-alpine
+    container_name: srm-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    networks:
+      - srm-network
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: srm-prometheus
+    restart: unless-stopped
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - srm-network
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: srm-grafana
+    restart: unless-stopped
+    ports:
+      - '3001:3000'
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - srm-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.56
+    container_name: srm-jaeger
+    restart: unless-stopped
+    ports:
+      - '16686:16686'
+      - '4318:4318'
+    environment:
+      COLLECTOR_OTLP_ENABLED: 'true'
+    networks:
+      - srm-network
+
 volumes:
   postgres_data:
     driver: local

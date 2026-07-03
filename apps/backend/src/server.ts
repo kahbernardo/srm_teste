@@ -8,8 +8,14 @@ import { transactionRoutes } from './presentation/routes/transaction.routes';
 import { currencyRoutes } from './presentation/routes/currency.routes';
 import { assetTypeRoutes } from './presentation/routes/asset-type.routes';
 import { exchangeRateRoutes } from './presentation/routes/exchange-rate.routes';
+import { eventRoutes } from './presentation/routes/event.routes';
+import { metricsRoutes } from './presentation/routes/metrics.routes';
 import { errorHandler } from './presentation/middlewares/error-handler';
+import { metrics } from './monitoring/metrics';
+import { initTracing, shutdownTracing } from './monitoring/tracing';
 import prisma from './persistence/prisma-client';
+
+initTracing();
 
 const server = Fastify({
   logger: {
@@ -165,6 +171,17 @@ async function start() {
     await server.register(currencyRoutes, { prefix: '/api/v1' });
     await server.register(assetTypeRoutes, { prefix: '/api/v1' });
     await server.register(exchangeRateRoutes, { prefix: '/api/v1' });
+    await server.register(eventRoutes, { prefix: '/api/v1' });
+    await server.register(metricsRoutes);
+
+    server.addHook('onResponse', async (request, reply) => {
+      const route = request.routeOptions?.url ?? request.url;
+      metrics.httpRequestsTotal.inc({
+        method: request.method,
+        route,
+        status: reply.statusCode,
+      });
+    });
 
     const port = parseInt(process.env.PORT || '4000', 10);
     const host = process.env.HOST || '0.0.0.0';
@@ -183,6 +200,7 @@ const signals = ['SIGINT', 'SIGTERM'];
 signals.forEach(signal => {
   process.on(signal, async () => {
     server.log.info(`Received ${signal}, closing server...`);
+    await shutdownTracing();
     await server.close();
     process.exit(0);
   });

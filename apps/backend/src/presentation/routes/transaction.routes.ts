@@ -3,6 +3,30 @@ import * as TransactionController from '../controllers/transaction.controller.fi
 
 export async function transactionRoutes(fastify: FastifyInstance) {
   fastify.post(
+    '/transactions/simulate',
+    {
+      schema: {
+        description: 'Simulate transaction pricing without persisting',
+        tags: ['transactions'],
+        body: {
+          type: 'object',
+          required: ['assetTypeId', 'currencyId', 'faceValue', 'daysToMaturity', 'createdBy'],
+          properties: {
+            externalReference: { type: 'string' },
+            assetTypeId: { type: 'string', format: 'uuid' },
+            currencyId: { type: 'string', format: 'uuid' },
+            faceValue: { type: 'number', minimum: 0.01 },
+            daysToMaturity: { type: 'integer', minimum: 1 },
+            targetCurrencyId: { type: 'string', format: 'uuid' },
+            createdBy: { type: 'string' },
+          },
+        },
+      },
+    },
+    TransactionController.simulateTransaction
+  );
+
+  fastify.post(
     '/transactions',
     {
       schema: {
@@ -106,6 +130,8 @@ export async function transactionRoutes(fastify: FastifyInstance) {
             startDate: { type: 'string', format: 'date-time' },
             endDate: { type: 'string', format: 'date-time' },
             limit: { type: 'integer', minimum: 1, maximum: 1000 },
+            page: { type: 'integer', minimum: 1 },
+            pageSize: { type: 'integer', minimum: 1, maximum: 100 },
           },
         },
         response: {
@@ -115,7 +141,7 @@ export async function transactionRoutes(fastify: FastifyInstance) {
             properties: {
               success: { type: 'boolean' },
               data: { type: 'array' },
-              count: { type: 'integer' },
+              pagination: { type: 'object' },
             },
           },
         },
