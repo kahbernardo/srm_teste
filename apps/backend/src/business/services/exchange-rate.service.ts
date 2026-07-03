@@ -1,6 +1,5 @@
 import prisma from '../../persistence/prisma-client';
 import { ExchangeRate } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
 
 export interface CreateExchangeRateInput {
   fromCurrencyId: string;
@@ -50,7 +49,7 @@ export class ExchangeRateService {
       data: {
         fromCurrencyId: input.fromCurrencyId,
         toCurrencyId: input.toCurrencyId,
-        rate: new Decimal(input.rate),
+        rate: input.rate,
         source: input.source,
         validFrom: now,
         validUntil: null,

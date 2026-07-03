@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
 
 const prisma = new PrismaClient();
 
@@ -41,7 +40,7 @@ async function main() {
     data: {
       fromCurrencyId: brl.id,
       toCurrencyId: usd.id,
-      rate: new Decimal('0.200000'), // 1 BRL = 0.20 USD
+      rate: 0.2, // 1 BRL = 0.20 USD
       validFrom: new Date('2024-01-01'),
       validUntil: null,
       source: 'BCB',
@@ -52,7 +51,7 @@ async function main() {
     data: {
       fromCurrencyId: usd.id,
       toCurrencyId: brl.id,
-      rate: new Decimal('5.000000'), // 1 USD = 5.00 BRL
+      rate: 5.0, // 1 USD = 5.00 BRL
       validFrom: new Date('2024-01-01'),
       validUntil: null,
       source: 'BCB',
@@ -98,10 +97,10 @@ async function main() {
     data: {
       assetTypeId: duplicata.id,
       strategyName: 'DuplicataStrategy',
-      baseSpread: new Decimal('0.015000'), // 1.5% ao ano
-      minSpread: new Decimal('0.010000'),
-      maxSpread: new Decimal('0.030000'),
-      riskMultiplier: new Decimal('1.000'),
+      baseSpread: 0.015, // 1.5% ao ano
+      minSpread: 0.01,
+      maxSpread: 0.03,
+      riskMultiplier: 1.0,
       validFrom: new Date('2024-01-01'),
       validUntil: null,
       active: true,
@@ -112,10 +111,10 @@ async function main() {
     data: {
       assetTypeId: cheque.id,
       strategyName: 'ChequeStrategy',
-      baseSpread: new Decimal('0.025000'), // 2.5% ao ano (maior risco)
-      minSpread: new Decimal('0.020000'),
-      maxSpread: new Decimal('0.050000'),
-      riskMultiplier: new Decimal('1.200'), // 20% adicional
+      baseSpread: 0.025, // 2.5% ao ano (maior risco)
+      minSpread: 0.02,
+      maxSpread: 0.05,
+      riskMultiplier: 1.2, // 20% adicional
       validFrom: new Date('2024-01-01'),
       validUntil: null,
       active: true,
@@ -126,10 +125,10 @@ async function main() {
     data: {
       assetTypeId: ccb.id,
       strategyName: 'DuplicataStrategy', // Reutiliza estratégia de duplicata
-      baseSpread: new Decimal('0.012000'), // 1.2% ao ano (menor risco)
-      minSpread: new Decimal('0.008000'),
-      maxSpread: new Decimal('0.020000'),
-      riskMultiplier: new Decimal('0.900'), // 10% desconto
+      baseSpread: 0.012, // 1.2% ao ano (menor risco)
+      minSpread: 0.008,
+      maxSpread: 0.02,
+      riskMultiplier: 0.9, // 10% desconto
       validFrom: new Date('2024-01-01'),
       validUntil: null,
       active: true,
@@ -145,11 +144,11 @@ async function main() {
       externalReference: 'DUP-2024-001',
       assetTypeId: duplicata.id,
       currencyId: brl.id,
-      faceValue: new Decimal('100000.00'),
+      faceValue: 100000.0,
       daysToMaturity: 90,
-      discountRate: new Decimal('0.003750'), // Calculado
-      discountAmount: new Decimal('375.00'),
-      netAmount: new Decimal('99625.00'),
+      discountRate: 0.00375, // Calculado
+      discountAmount: 375.0,
+      netAmount: 99625.0,
       status: 'SETTLED',
       settledAt: new Date(),
       createdBy: 'system',
@@ -161,11 +160,11 @@ async function main() {
       externalReference: 'CHQ-2024-002',
       assetTypeId: cheque.id,
       currencyId: brl.id,
-      faceValue: new Decimal('50000.00'),
+      faceValue: 50000.0,
       daysToMaturity: 60,
-      discountRate: new Decimal('0.005000'),
-      discountAmount: new Decimal('250.00'),
-      netAmount: new Decimal('49750.00'),
+      discountRate: 0.005,
+      discountAmount: 250.0,
+      netAmount: 49750.0,
       status: 'PENDING',
       createdBy: 'system',
     },

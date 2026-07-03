@@ -1,29 +1,22 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
+// SQLite version for local testing (dev only)
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
-
-// ========================================
-// CURRENCY ENGINE
-// ========================================
 
 model Currency {
   id        String   @id @default(uuid())
-  code      String   @unique @db.VarChar(3) // BRL, USD
-  name      String   @db.VarChar(100)
-  symbol    String   @db.VarChar(5) // R$, $
+  code      String   @unique
+  name      String
+  symbol    String
   active    Boolean  @default(true)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  // Relations
   exchangeRatesFrom ExchangeRate[] @relation("FromCurrency")
   exchangeRatesTo   ExchangeRate[] @relation("ToCurrency")
   transactions      Transaction[]
@@ -32,39 +25,32 @@ model Currency {
 }
 
 model ExchangeRate {
-  id             String   @id @default(uuid())
-  fromCurrencyId String   @map("from_currency_id")
-  toCurrencyId   String   @map("to_currency_id")
-  rate           Decimal  @db.Decimal(18, 6) // 6 casas decimais para precisão
-  validFrom      DateTime @map("valid_from") @db.Timestamptz
-  validUntil     DateTime? @map("valid_until") @db.Timestamptz
-  source         String   @db.VarChar(100) // BCB, Manual, etc
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id             String    @id @default(uuid())
+  fromCurrencyId String    @map("from_currency_id")
+  toCurrencyId   String    @map("to_currency_id")
+  rate           Float
+  validFrom      DateTime  @map("valid_from")
+  validUntil     DateTime? @map("valid_until")
+  source         String
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  // Relations
   fromCurrency Currency @relation("FromCurrency", fields: [fromCurrencyId], references: [id])
   toCurrency   Currency @relation("ToCurrency", fields: [toCurrencyId], references: [id])
 
   @@unique([fromCurrencyId, toCurrencyId, validFrom])
-  @@index([validFrom, validUntil])
   @@map("exchange_rates")
 }
 
-// ========================================
-// PRICING ENGINE
-// ========================================
-
 model AssetType {
   id          String   @id @default(uuid())
-  code        String   @unique @db.VarChar(50) // DUPLICATA, CHEQUE, CCB
-  name        String   @db.VarChar(200)
-  description String?  @db.Text
+  code        String   @unique
+  name        String
+  description String?
   active      Boolean  @default(true)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  // Relations
   pricingStrategies PricingStrategy[]
   transactions      Transaction[]
 
@@ -72,95 +58,60 @@ model AssetType {
 }
 
 model PricingStrategy {
-  id              String   @id @default(uuid())
-  assetTypeId     String   @map("asset_type_id")
-  strategyName    String   @map("strategy_name") @db.VarChar(100) // DuplicataStrategy, ChequeStrategy
-  baseSpread      Decimal  @map("base_spread") @db.Decimal(8, 6) // 0.015000 = 1.5%
-  minSpread       Decimal  @map("min_spread") @db.Decimal(8, 6)
-  maxSpread       Decimal  @map("max_spread") @db.Decimal(8, 6)
-  riskMultiplier  Decimal  @map("risk_multiplier") @db.Decimal(5, 3) // 1.000 = sem ajuste
-  validFrom       DateTime @map("valid_from") @db.Timestamptz
-  validUntil      DateTime? @map("valid_until") @db.Timestamptz
-  active          Boolean  @default(true)
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id             String    @id @default(uuid())
+  assetTypeId    String    @map("asset_type_id")
+  strategyName   String    @map("strategy_name")
+  baseSpread     Float     @map("base_spread")
+  minSpread      Float     @map("min_spread")
+  maxSpread      Float     @map("max_spread")
+  riskMultiplier Float     @map("risk_multiplier")
+  validFrom      DateTime  @map("valid_from")
+  validUntil     DateTime? @map("valid_until")
+  active         Boolean   @default(true)
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  // Relations
   assetType AssetType @relation(fields: [assetTypeId], references: [id])
 
   @@unique([assetTypeId, validFrom])
-  @@index([validFrom, validUntil])
   @@map("pricing_strategies")
 }
 
-// ========================================
-// TRANSACTION SETTLEMENT
-// ========================================
-
-enum TransactionStatus {
-  PENDING
-  SETTLED
-  FAILED
-  CANCELLED
-
-  @@map("transaction_status")
-}
-
 model Transaction {
-  id                   String            @id @default(uuid())
-  externalReference    String?           @map("external_reference") @db.VarChar(100) // ID do sistema cedente
-  assetTypeId          String            @map("asset_type_id")
-  currencyId           String            @map("currency_id")
+  id                  String    @id @default(uuid())
+  externalReference   String?   @map("external_reference")
+  assetTypeId         String    @map("asset_type_id")
+  currencyId          String    @map("currency_id")
+  faceValue           Float     @map("face_value")
+  daysToMaturity      Int       @map("days_to_maturity")
+  discountRate        Float     @map("discount_rate")
+  discountAmount      Float     @map("discount_amount")
+  netAmount           Float     @map("net_amount")
+  exchangeRateApplied Float?    @map("exchange_rate_applied")
+  convertedAmount     Float?    @map("converted_amount")
+  targetCurrencyId    String?   @map("target_currency_id")
+  status              String    @default("PENDING")
+  settledAt           DateTime? @map("settled_at")
+  createdBy           String    @map("created_by")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  version             Int       @default(1)
 
-  // Valores originais
-  faceValue            Decimal           @map("face_value") @db.Decimal(18, 2) // Valor de face do ativo
-  daysToMaturity       Int               @map("days_to_maturity") // Prazo até vencimento
-
-  // Pricing calculado
-  discountRate         Decimal           @map("discount_rate") @db.Decimal(8, 6) // Taxa aplicada
-  discountAmount       Decimal           @map("discount_amount") @db.Decimal(18, 2) // Deságio
-  netAmount            Decimal           @map("net_amount") @db.Decimal(18, 2) // Valor líquido
-
-  // Conversão cambial (se aplicável)
-  exchangeRateApplied  Decimal?          @map("exchange_rate_applied") @db.Decimal(18, 6)
-  convertedAmount      Decimal?          @map("converted_amount") @db.Decimal(18, 2)
-  targetCurrencyId     String?           @map("target_currency_id")
-
-  // Settlement
-  status               TransactionStatus @default(PENDING)
-  settledAt            DateTime?         @map("settled_at") @db.Timestamptz
-
-  // Audit trail
-  createdBy            String            @map("created_by") @db.VarChar(100) // User ID ou sistema
-  createdAt            DateTime          @default(now()) @map("created_at")
-  updatedAt            DateTime          @updatedAt @map("updated_at")
-  version              Int               @default(1) // Optimistic locking
-
-  // Relations
   assetType AssetType @relation(fields: [assetTypeId], references: [id])
   currency  Currency  @relation(fields: [currencyId], references: [id])
 
-  @@index([status, settledAt])
-  @@index([createdAt])
-  @@index([externalReference])
   @@map("transactions")
 }
 
-// ========================================
-// AUDIT LOG (opcional, mas recomendado)
-// ========================================
-
 model AuditLog {
   id          String   @id @default(uuid())
-  entityType  String   @map("entity_type") @db.VarChar(50) // Transaction, ExchangeRate, etc
+  entityType  String   @map("entity_type")
   entityId    String   @map("entity_id")
-  action      String   @db.VarChar(20) // CREATE, UPDATE, DELETE
-  changes     Json?    // JSON com before/after
-  performedBy String   @map("performed_by") @db.VarChar(100)
-  performedAt DateTime @default(now()) @map("performed_at") @db.Timestamptz
-  ipAddress   String?  @map("ip_address") @db.VarChar(45)
+  action      String
+  changes     String?
+  performedBy String   @map("performed_by")
+  performedAt DateTime @default(now()) @map("performed_at")
+  ipAddress   String?  @map("ip_address")
 
-  @@index([entityType, entityId])
-  @@index([performedAt])
   @@map("audit_logs")
 }

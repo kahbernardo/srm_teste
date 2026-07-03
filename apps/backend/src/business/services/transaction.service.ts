@@ -58,8 +58,8 @@ export class TransactionService {
       const pricingResult = strategy.calculate({
         faceValue: new Decimal(input.faceValue),
         daysToMaturity: input.daysToMaturity,
-        baseSpread: pricingStrategy.baseSpread,
-        riskMultiplier: pricingStrategy.riskMultiplier,
+        baseSpread: new Decimal(pricingStrategy.baseSpread),
+        riskMultiplier: new Decimal(pricingStrategy.riskMultiplier),
       });
 
       // 3. Conversão cambial (se necessário)
@@ -83,8 +83,8 @@ export class TransactionService {
           );
         }
 
-        exchangeRateApplied = exchangeRate.rate;
-        convertedAmount = pricingResult.netAmount.mul(exchangeRate.rate);
+        exchangeRateApplied = new Decimal(exchangeRate.rate);
+        convertedAmount = pricingResult.netAmount.mul(new Decimal(exchangeRate.rate));
       }
 
       // 4. Criar transação
@@ -93,28 +93,28 @@ export class TransactionService {
           externalReference: input.externalReference,
           assetTypeId: input.assetTypeId,
           currencyId: input.currencyId,
-          faceValue: new Decimal(input.faceValue),
+          faceValue: input.faceValue,
           daysToMaturity: input.daysToMaturity,
-          discountRate: pricingResult.discountRate,
-          discountAmount: pricingResult.discountAmount,
-          netAmount: pricingResult.netAmount,
-          exchangeRateApplied,
-          convertedAmount,
+          discountRate: pricingResult.discountRate.toNumber(),
+          discountAmount: pricingResult.discountAmount.toNumber(),
+          netAmount: pricingResult.netAmount.toNumber(),
+          exchangeRateApplied: exchangeRateApplied?.toNumber(),
+          convertedAmount: convertedAmount?.toNumber(),
           targetCurrencyId: input.targetCurrencyId,
-          status: TransactionStatus.PENDING,
+          status: 'PENDING',
           createdBy: input.createdBy,
         },
       });
 
       return {
         id: transaction.id,
-        faceValue: transaction.faceValue,
-        discountRate: transaction.discountRate,
-        discountAmount: transaction.discountAmount,
-        netAmount: transaction.netAmount,
-        convertedAmount: transaction.convertedAmount || undefined,
-        exchangeRateApplied: transaction.exchangeRateApplied || undefined,
-        status: transaction.status,
+        faceValue: new Decimal(transaction.faceValue),
+        discountRate: new Decimal(transaction.discountRate),
+        discountAmount: new Decimal(transaction.discountAmount),
+        netAmount: new Decimal(transaction.netAmount),
+        convertedAmount: transaction.convertedAmount ? new Decimal(transaction.convertedAmount) : undefined,
+        exchangeRateApplied: transaction.exchangeRateApplied ? new Decimal(transaction.exchangeRateApplied) : undefined,
+        status: transaction.status as TransactionStatus,
       };
     });
   }
@@ -129,7 +129,7 @@ export class TransactionService {
         throw new Error('Transaction not found');
       }
 
-      if (transaction.status !== TransactionStatus.PENDING) {
+      if (transaction.status !== 'PENDING') {
         throw new Error(`Transaction cannot be settled. Current status: ${transaction.status}`);
       }
 
@@ -139,7 +139,7 @@ export class TransactionService {
           version: transaction.version, // Optimistic locking
         },
         data: {
-          status: TransactionStatus.SETTLED,
+          status: 'SETTLED',
           settledAt: new Date(),
           version: { increment: 1 },
         },
