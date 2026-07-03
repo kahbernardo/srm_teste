@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { TransactionService, TransactionStatus } from '../../business/services/transaction.service';
 import { z } from 'zod';
+import { NotFoundError, ValidationError } from '../errors';
 
 const transactionService = new TransactionService();
 
@@ -24,107 +25,55 @@ const listTransactionsSchema = z.object({
 });
 
 export async function createTransaction(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const body = createTransactionSchema.parse(request.body);
-    const result = await transactionService.createTransaction(body);
+  const body = createTransactionSchema.parse(request.body);
+  const result = await transactionService.createTransaction(body);
 
-    reply.status(201);
-    return {
-      success: true,
-      data: result,
-    };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      reply.status(400);
-      return {
-        success: false,
-        error: 'Validation error',
-        details: error.errors,
-      };
-    }
-    reply.status(500);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Internal server error',
-    };
-  }
+  reply.status(201);
+  return {
+    success: true,
+    data: result,
+  };
 }
 
 export async function settleTransaction(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { transactionId } = request.params as { transactionId: string };
-    const result = await transactionService.settleTransaction(transactionId);
+  const { transactionId } = request.params as { transactionId: string };
+  const result = await transactionService.settleTransaction(transactionId);
 
-    return {
-      success: true,
-      data: result,
-    };
-  } catch (error) {
-    reply.status(500);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Internal server error',
-    };
-  }
+  return {
+    success: true,
+    data: result,
+  };
 }
 
 export async function getTransaction(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const { transactionId } = request.params as { transactionId: string };
-    const result = await transactionService.getTransaction(transactionId);
+  const { transactionId } = request.params as { transactionId: string };
+  const result = await transactionService.getTransaction(transactionId);
 
-    if (!result) {
-      reply.status(404);
-      return {
-        success: false,
-        error: 'Transaction not found',
-      };
-    }
-
-    return {
-      success: true,
-      data: result,
-    };
-  } catch (error) {
-    reply.status(500);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Internal server error',
-    };
+  if (!result) {
+    throw new NotFoundError('Transaction not found');
   }
+
+  return {
+    success: true,
+    data: result,
+  };
 }
 
 export async function listTransactions(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const query = listTransactionsSchema.parse(request.query);
+  const query = listTransactionsSchema.parse(request.query);
 
-    const filters = {
-      ...query,
-      status: query.status as TransactionStatus | undefined,
-      startDate: query.startDate ? new Date(query.startDate) : undefined,
-      endDate: query.endDate ? new Date(query.endDate) : undefined,
-    };
+  const filters = {
+    ...query,
+    status: query.status as TransactionStatus | undefined,
+    startDate: query.startDate ? new Date(query.startDate) : undefined,
+    endDate: query.endDate ? new Date(query.endDate) : undefined,
+  };
 
-    const result = await transactionService.listTransactions(filters);
+  const result = await transactionService.listTransactions(filters);
 
-    return {
-      success: true,
-      data: result,
-      count: result.length,
-    };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      reply.status(400);
-      return {
-        success: false,
-        error: 'Validation error',
-        details: error.errors,
-      };
-    }
-    reply.status(500);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Internal server error',
-    };
-  }
+  return {
+    success: true,
+    data: result,
+    count: result.length,
+  };
 }

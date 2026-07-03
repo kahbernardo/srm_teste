@@ -2,6 +2,7 @@ import { Decimal } from '@prisma/client/runtime/library';
 import { Transaction } from '@prisma/client';
 import prisma from '../../persistence/prisma-client';
 import { PricingStrategyFactory } from '../pricing/pricing-strategy-factory';
+import { NotFoundError, BusinessError } from '../../presentation/errors';
 
 // SQLite doesn't support enums, so we define it here
 export enum TransactionStatus {
@@ -52,11 +53,11 @@ export class TransactionService {
       });
 
       if (!assetType || !assetType.active) {
-        throw new Error('Asset type not found or inactive');
+        throw new NotFoundError('Asset type not found or inactive');
       }
 
       if (assetType.pricingStrategies.length === 0) {
-        throw new Error('No active pricing strategy found for this asset type');
+        throw new BusinessError('No active pricing strategy found for this asset type');
       }
 
       const pricingStrategy = assetType.pricingStrategies[0];
@@ -86,7 +87,7 @@ export class TransactionService {
         });
 
         if (!exchangeRate) {
-          throw new Error(
+          throw new BusinessError(
             `No active exchange rate found from ${input.currencyId} to ${input.targetCurrencyId}`
           );
         }
@@ -134,11 +135,11 @@ export class TransactionService {
       });
 
       if (!transaction) {
-        throw new Error('Transaction not found');
+        throw new NotFoundError('Transaction not found');
       }
 
       if (transaction.status !== 'PENDING') {
-        throw new Error(`Transaction cannot be settled. Current status: ${transaction.status}`);
+        throw new BusinessError(`Transaction cannot be settled. Current status: ${transaction.status}`);
       }
 
       return await tx.transaction.update({

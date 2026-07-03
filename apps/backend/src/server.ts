@@ -8,6 +8,7 @@ import { transactionRoutes } from './presentation/routes/transaction.routes';
 import { currencyRoutes } from './presentation/routes/currency.routes';
 import { assetTypeRoutes } from './presentation/routes/asset-type.routes';
 import { exchangeRateRoutes } from './presentation/routes/exchange-rate.routes';
+import { errorHandler } from './presentation/middlewares/error-handler';
 import prisma from './persistence/prisma-client';
 
 const server = Fastify({
@@ -28,6 +29,9 @@ const server = Fastify({
 
 async function start() {
   try {
+    // Global error handler
+    server.setErrorHandler(errorHandler);
+
     // Security middleware
     await server.register(helmet, {
       contentSecurityPolicy: {
